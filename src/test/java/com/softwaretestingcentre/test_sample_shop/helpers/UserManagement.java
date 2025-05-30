@@ -11,11 +11,13 @@ import net.serenitybdd.screenplay.ensure.Ensure;
 import net.serenitybdd.screenplay.questions.Text;
 
 import static io.restassured.RestAssured.when;
+import static net.serenitybdd.screenplay.actors.OnStage.theActorInTheSpotlight;
 
 public class UserManagement {
 
     public static Performable createUser(String username, String password) {
         deleteUserByName(username);
+        theActorInTheSpotlight().remember("username", username);
         return Task.where("Create a user with " + username + " and " + password,
                 SendKeys.of("q").into(CreateUserPage.EMAIL),
                 DoubleClick.on(CreateUserPage.EMAIL),
@@ -29,12 +31,13 @@ public class UserManagement {
                 Click.on(CreateUserPage.SIGN_UP));
     }
 
-    public static Performable checkUserWasCreated(String username) {
+    public static Performable checkUserWasCreated() {
+        String username = theActorInTheSpotlight().recall("username");
         return Ensure.that(Text.of(CreateUserPage.SUCCESS_MESSAGE))
                 .matches("User created",
                         message ->
                                 message.equals("Congratulations! Your account has been created!")
-                                && getUserIdFromUsername(username) > 0);
+                                        && getUserIdFromUsername(username) > 0);
     }
 
     public static int getUserIdFromUsername(String username) {

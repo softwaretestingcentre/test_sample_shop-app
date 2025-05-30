@@ -18,13 +18,13 @@ public class UserManagementStepDefinitions {
     }
 
     @When("{actor} enters {string} and {string} login details")
-    public void entersLoginDetails(Actor actor, String userEmail, String userPassword) {
-        actor.attemptsTo(UserManagement.createUser(userEmail, userPassword));
+    public void entersLoginDetails(Actor actor, String username, String userPassword) {
+        actor.attemptsTo(UserManagement.createUser(username, userPassword));
     }
 
-    @Then("A new account is created for {actor} with username {string}")
-    public void aNewAccountIsCreated(Actor actor, String username) {
-        actor.attemptsTo(UserManagement.checkUserWasCreated(username));
+    @Then("A new account is created for {actor}")
+    public void aNewAccountIsCreated(Actor actor) {
+        actor.attemptsTo(UserManagement.checkUserWasCreated());
     }
 
 }
