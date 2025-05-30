@@ -22,9 +22,9 @@ public class UserManagementStepDefinitions {
         actor.attemptsTo(UserManagement.createUser(userEmail, userPassword));
     }
 
-    @Then("A new account is created for {actor}")
-    public void aNewAccountIsCreated(Actor actor) {
-        actor.attemptsTo(UserManagement.checkUserWasCreated());
+    @Then("A new account is created for {actor} with username {string}")
+    public void aNewAccountIsCreated(Actor actor, String username) {
+        actor.attemptsTo(UserManagement.checkUserWasCreated(username));
     }
 
 }

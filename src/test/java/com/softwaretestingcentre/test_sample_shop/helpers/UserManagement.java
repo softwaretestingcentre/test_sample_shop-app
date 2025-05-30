@@ -1,28 +1,25 @@
 package com.softwaretestingcentre.test_sample_shop.helpers;
 
-import net.serenitybdd.rest.SerenityRest;
-import net.serenitybdd.screenplay.Actor;
+import io.restassured.http.ContentType;
 import net.serenitybdd.screenplay.Performable;
 import net.serenitybdd.screenplay.Task;
-import net.serenitybdd.screenplay.actions.*;
+import net.serenitybdd.screenplay.actions.Click;
+import net.serenitybdd.screenplay.actions.DoubleClick;
+import net.serenitybdd.screenplay.actions.Enter;
+import net.serenitybdd.screenplay.actions.SendKeys;
 import net.serenitybdd.screenplay.ensure.Ensure;
 import net.serenitybdd.screenplay.questions.Text;
-import net.serenitybdd.screenplay.rest.abilities.CallAnApi;
-import net.serenitybdd.screenplay.rest.interactions.Delete;
-import net.serenitybdd.screenplay.rest.interactions.Get;
+
+import static io.restassured.RestAssured.when;
 
 public class UserManagement {
-//    private static EnvironmentVariables envVars;
-//
-    private static final Actor Dobby = Actor.named("Database user")
-            .whoCan(CallAnApi.at("http://localhost:8080/api"));
 
-    public static Performable createUser(String email, String password) {
-        deleteUserByName(email);
-        return Task.where("Create a user with " + email + " and " + password,
+    public static Performable createUser(String username, String password) {
+        deleteUserByName(username);
+        return Task.where("Create a user with " + username + " and " + password,
                 SendKeys.of("q").into(CreateUserPage.EMAIL),
                 DoubleClick.on(CreateUserPage.EMAIL),
-                Enter.keyValues(email).into(CreateUserPage.EMAIL),
+                Enter.keyValues(username).into(CreateUserPage.EMAIL),
 
                 Click.on(CreateUserPage.PASSWORD),
                 SendKeys.of("q").into(CreateUserPage.PASSWORD),
@@ -32,33 +29,34 @@ public class UserManagement {
                 Click.on(CreateUserPage.SIGN_UP));
     }
 
-    public static Performable checkUserWasCreated() {
+    public static Performable checkUserWasCreated(String username) {
         return Ensure.that(Text.of(CreateUserPage.SUCCESS_MESSAGE))
-                .matches("Congratulations! Your account has been created!");
+                .matches("User created",
+                        message ->
+                                message.equals("Congratulations! Your account has been created!")
+                                && getUserIdFromUsername(username) > 0);
     }
 
-    public static String getUserId(String username) {
-        Dobby.attemptsTo(
-                Get.resource("http://localhost:8080/api/customer/username=" + username)
-        );
+    public static int getUserIdFromUsername(String username) {
+        int userId = 0;
         try {
-            User user = SerenityRest.lastResponse()
-                    .jsonPath()
-                    .getObject("data", User.class);
-            return user.getCustomerIf();
+            userId = when().get("http://localhost:8080/api/customer/username=" + username)
+                    .then().contentType(ContentType.JSON)
+                    .extract().path("customerIf"); //sic
         } catch (Exception ignored) {
-            return "NOT FOUND";
         }
+        return userId;
     }
 
-    public static void deleteUser(String userId) {
-        Dobby.attemptsTo(Delete.from("http://localhost:8080/api/customer/" + userId));
+    public static void deleteUserWithId(int userId) {
+        when().delete("http://localhost:8080/api/customer/" + userId)
+                .then().statusCode(204);
     }
 
     public static void deleteUserByName(String username) {
-        String userId = getUserId(username);
-        if (userId.equals("NOT FOUND")) return;
-        deleteUser(userId);
+        int userId = getUserIdFromUsername(username);
+        if (userId == 0) return;
+        deleteUserWithId(userId);
     }
 
 }
