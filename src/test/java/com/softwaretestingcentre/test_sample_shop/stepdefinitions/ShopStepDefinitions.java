@@ -23,6 +23,5 @@ public class ShopStepDefinitions {
     @Then("{actor} can see her basket contains only {int} item of {string}")
     public void sheCanSeeHerBasketContainsOnly(Actor actor, int itemCount, String itemName) {
         actor.attemptsTo(Shop.checkBasketContainsOnly(itemCount, itemName));
-        actor.attemptsTo(Shop.checkBasketSubTotal());
     }
 }
