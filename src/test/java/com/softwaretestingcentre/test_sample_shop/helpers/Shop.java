@@ -18,12 +18,26 @@ public class Shop {
 
     public static Performable openBasket() {
         return Task.where("opens basket",
-                Click.on(ShopPage.CHECKOUT));
+                actor -> {
+                    actor.attemptsTo(Click.on(ShopPage.CHECKOUT));
+                    actor.remember("basket contents", Text.of(CheckoutPage.BASKET_ITEMS));
+                    actor.remember("basket subtotal", Text.of(CheckoutPage.SUB_TOTAL));
+                }
+        );
     }
 
     public static Performable checkBasketContainsOnly(int itemCount, String itemName) {
         String itemPrice = theActorInTheSpotlight().recall("item cost").toString().replaceAll("^.", "");
-        return Ensure.that(Text.of(CheckoutPage.BASKET_ITEMS))
-                .matches(itemName + "\nQuantity " + itemCount + "remove\n" + itemPrice);
+        String basketContent = theActorInTheSpotlight().recall("basket contents");
+        return Ensure.that(basketContent)
+                .isEqualTo(itemName + "\nQuantity " + itemCount + "remove\n" + itemPrice);
     }
+
+    public static Performable checkBasketSubTotal() {
+        String itemPrice = theActorInTheSpotlight().recall("item cost").toString();
+        String subTotal = theActorInTheSpotlight().recall("basket subtotal");
+        return Ensure.that(subTotal)
+                .isEqualTo(itemPrice + ".00");
+    }
+
 }
