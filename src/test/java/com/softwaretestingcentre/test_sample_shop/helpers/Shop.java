@@ -7,15 +7,15 @@ import net.serenitybdd.screenplay.actions.Click;
 import net.serenitybdd.screenplay.ensure.Ensure;
 import net.serenitybdd.screenplay.questions.Text;
 
-import static net.serenitybdd.screenplay.actors.OnStage.theActorInTheSpotlight;
-
 public class Shop {
 
-    public static Performable addItemToBasket(String itemName) {
+    public static Performable addItemsToBasket(int itemCount, String itemName) {
         return Task.where("adds " + itemName + " to basket",
                 actor -> {
                     actor.remember("item cost", Text.of(ShopPage.ITEM_COST.of(itemName)));
-                    actor.attemptsTo(Click.on(ShopPage.ADD_ITEM.of(itemName)));
+                    for (int i = 0; i < itemCount; i++) {
+                        actor.attemptsTo(Click.on(ShopPage.ADD_ITEM.of(itemName)));
+                    }
                 }
         );
     }
@@ -34,10 +34,12 @@ public class Shop {
         return Question.about("basket contents").answeredBy(
                 actor -> {
                     String itemPrice = actor.recall("item cost").toString().replaceAll("^.", "");
-                    String basketContent = actor.recall("basket contents");
+                    String itemTotal = "$" + (itemCount * Integer.parseInt(itemPrice)) + ".00";
+                    String basketContents = actor.recall("basket contents");
                     String subTotal = actor.recall("basket subtotal");
-                    return basketContent.equals(itemName + "\nQuantity " + itemCount + "remove\n" + itemPrice)
-                            && subTotal.equals("$" + itemPrice + ".00");
+
+                    return basketContents.equals(itemName + "\nQuantity " + itemCount + "remove\n" + itemPrice)
+                            && subTotal.equals(itemTotal);
                 }
         );
     }

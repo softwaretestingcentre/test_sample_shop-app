@@ -9,10 +9,11 @@ import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.actions.Open;
 
 public class ShopStepDefinitions {
-    @Given("{actor} adds {string} to her basket")
-    public void bettyAddsToHerBasket(Actor actor, String itemName) {
+
+    @Given("{actor} adds {int} item/items of {string} to her basket")
+    public void bettyAddsToHerBasket(Actor actor, int itemCount, String itemName) {
         actor.wasAbleTo(Open.browserOn().the(LandingPage.class));
-        actor.attemptsTo(Shop.addItemToBasket(itemName));
+        actor.attemptsTo(Shop.addItemsToBasket(itemCount, itemName));
     }
 
     @When("{actor} checks her basket")
@@ -20,7 +21,7 @@ public class ShopStepDefinitions {
         actor.attemptsTo(Shop.openBasket());
     }
 
-    @Then("{actor} can see her basket contains only {int} item of {string}")
+    @Then("{actor} can see her basket contains only {int} item/items of {string}")
     public void sheCanSeeHerBasketContainsOnly(Actor actor, int itemCount, String itemName) {
         actor.attemptsTo(Shop.checkBasketContainsOnly(itemCount, itemName));
     }
