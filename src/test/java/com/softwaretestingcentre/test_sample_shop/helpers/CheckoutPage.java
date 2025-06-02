@@ -5,9 +5,6 @@ import net.serenitybdd.screenplay.targets.Target;
 
 public class CheckoutPage extends PageObject {
 
-    public static Target BASKET = Target.the("Basket")
-            .locatedBy("//*[@class='productSection']");
-
     public static Target BASKET_ITEMS = Target.the("Item in basket")
             .locatedBy("//*[@class='productItem']");
 
