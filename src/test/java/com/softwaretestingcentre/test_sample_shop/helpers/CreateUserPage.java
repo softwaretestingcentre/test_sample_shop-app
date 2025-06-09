@@ -17,4 +17,6 @@ public class CreateUserPage extends PageObject {
     public static Target SUCCESS_MESSAGE = Target.the("User created successfully message")
             .locatedBy(".successMessage");
 
+    public static String EXPECTED_SUCCESS_MESSAGE = "Congratulations! Your account has been created!";
+
 }
